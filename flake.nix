@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }:
     let
-      inherit (nixpkgs.lib) genAttrs optional;
+      inherit (nixpkgs.lib) genAttrs optional optionals;
       eachSystem = f: genAttrs
         [
           "aarch64-darwin"
@@ -23,7 +23,7 @@
           name = "minegrub-theme";
           src = "${self}";
 
-          buildInputs = with pkgs; optional customSplash
+          buildInputs = with pkgs; optionals customSplash
             [
               fastfetch
               (python3.withPackages

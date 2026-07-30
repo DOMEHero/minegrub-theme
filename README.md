@@ -90,7 +90,12 @@ sudo ./install_theme.sh
       enable = true;
       splash = "100% Flakes!";
       background = "background_options/1.8  - [Classic Minecraft].png";
+      # Number of visible menu rows before the menu starts scrolling.
       boot-options-count = 4;
+      # Number of NixOS generations kept in the configurations submenu.
+      configurationLimit = 20;
+      # Optional background shown in the GRUB console opened with `c`.
+      console-background = ./console-background.png;
     };
     # ...
   };
@@ -106,6 +111,8 @@ sudo ./install_theme.sh
 - To move that bar down and fix this, all you need to do is edit [this line](https://github.com/Lxtharia/minegrub-theme/blob/main/minegrub/theme.txt#L71) in the theme.txt: `/boot/grub/themes/minegrub/theme.txt`
   - (You can also edit the file in the cloned repository so you don't overwrite it again when you update the theme at some point (via a `cp -r`))
 - The formula and some precalculated values (for 2,3,4,5... boot options) are in the `theme.txt`, so you should be able to easily change it to the correct value.
+
+For NixOS module users, `boot-options-count` also controls how many rows are visible in a submenu. Longer submenus scroll inside that area instead of overlapping the bottom bar. Use `configurationLimit` in the `minegrub-theme` set to control how many generations are included in the submenu.
 
 ## Updating splash text, background and "x Packages Installed" text after every boot!
 
@@ -145,6 +152,11 @@ sudo update-rc.d minecraft-grub defaults
 ## Setting the console background
 
 When in grub, pressing 'c' opens the grub console.
+NixOS module users can set its background in the Minegrub options:
+```nix
+boot.loader.grub.minegrub-theme.console-background = ./console-background.png;
+```
+
 If you want that console to have a background you can specify `GRUB_BACKGROUND=<path>` in `/etc/defaults/grub`
 
 **Though this doesn't work if a theme is set**, so you first need to change a line in a grub file.

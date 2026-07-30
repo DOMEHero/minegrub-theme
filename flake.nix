@@ -34,7 +34,9 @@
             sed -i '$d' minegrub/update_theme.py
 
             top_value=$((170 + (${toString boot-options-count} - 2) * 72))
+            menu_height=$((72 * ${toString boot-options-count}))
             sed -i '/^+ image {/,/^}$/s/top = 40%+[0-9]\+/top = 40%+'"$top_value"'/' minegrub/theme.txt
+            sed -i '/^+ boot_menu {/,/^}$/s/height = 500/height = '"$menu_height"'/' minegrub/theme.txt
           '';
 
           buildPhase = optional customSplash ''
@@ -54,7 +56,7 @@
       nixosModules.default = { config, pkgs, ... }:
         let
           cfg = config.boot.loader.grub.minegrub-theme;
-          inherit (nixpkgs.lib) mkOption types mkIf;
+          inherit (nixpkgs.lib) literalExpression mkIf mkOption mkOverride types;
         in
         {
           options = {
@@ -64,7 +66,26 @@
                 example = 4;
                 type = types.number;
                 description = ''
-                  Number of boot options.
+                  Number of visible boot menu rows. Longer submenus scroll
+                  within this area.
+                '';
+              };
+              configurationLimit = mkOption {
+                default = 100;
+                example = 20;
+                type = types.int;
+                description = ''
+                  Maximum number of NixOS generations kept in the
+                  configurations submenu.
+                '';
+              };
+              console-background = mkOption {
+                default = null;
+                example = literalExpression "./console-background.png";
+                type = types.nullOr types.path;
+                description = ''
+                  Optional background shown in the GRUB console opened with
+                  `c`. The Minegrub background is used when this is null.
                 '';
               };
               splash = mkOption {
@@ -104,8 +125,13 @@
                 };
               in
               {
+                configurationLimit = cfg.configurationLimit;
                 theme = "${minegrub-theme}/grub/themes/minegrub";
-                splashImage = "${minegrub-theme}/grub/themes/minegrub/background.png";
+                splashImage =
+                  if cfg.console-background == null then
+                    mkOverride 900 "${minegrub-theme}/grub/themes/minegrub/background.png"
+                  else
+                    cfg.console-background;
               };
           };
         };

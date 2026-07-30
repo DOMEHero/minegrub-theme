@@ -13,14 +13,16 @@ terminal-box: "term_*.png"
 terminal-font: "Monocraft Regular 22"
 
 # Text White 
+# GRUB cannot size a menu from its longest entry or scroll text horizontally,
+# so use the available screen width for long labels.
 + boot_menu {
 	# as we don't have any pixmaps here, it gets aligned strangely
 	# top pixmap is 17px in height 
 	# left pixmap is 6px in width 
 	# the text needs to be 3 pixels above and 3 pixels to the left
-	left = 50%-297 
+	left = 10%+3
 	top = 40%+14
-	width = 600
+	width = 80%
 	height = 500
 
 	item_font = "Minecraft Regular 30"
@@ -34,9 +36,9 @@ terminal-font: "Monocraft Regular 22"
 
 
 + boot_menu {
-	left = 50%-300
+	left = 10%
 	top = 40%
-	width = 600
+	width = 80%
 	height = 500
 
 	item_font = "Minecraft Regular 30"
@@ -160,5 +162,3 @@ terminal-font: "Monocraft Regular 22"
 	font = "Minecraft Regular 30"
 	color = "#3f3f3f"
 }
-
-

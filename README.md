@@ -19,11 +19,19 @@ A Grub Theme in the style of Minecraft!
 
 # Installation
 
+## Using the installation script
+Run the interactive installation script as root and at your own risk (It's run as sudo after all)
+```
+sudo ./install_theme.sh
+```
+- This will help you install the theme, the systemd service and enable the console background (see below)
+- It also lets you choose a background if you don't want to randomize it
+
+## Manually
+
 > ### Note: grub vs grub2
 > - If you have a `/boot/grub2` folder instead of a `/boot/grub` folder , you need to adjust the file paths mentioned here and in the `minegrub-update.service` file
 > - Also if you're not sure, run `grub-mkconfig -V` to check if you have grub version 2 (you should have)
-
-## Manually
 
 - Clone this repository
 ```
@@ -51,14 +59,6 @@ GRUB_THEME=/boot/grub/themes/minegrub/theme.txt
     ```
 - You're good to go!
 - Check out the `Configuration` section if you want to auto-update the splash text, the background and the packages display after every boot
-
-## Using the installation script
-- Run the installation script as root and at your own risk (It's run as sudo after all)
-```
-sudo ./install_theme.sh
-```
-- This will help you to install the theme, the systemd service and enable the console background
-- It also lets you choose a background if you don't want to randomize it
 
 ---
 
@@ -98,6 +98,17 @@ sudo ./install_theme.sh
 ```
 </details>
 
+# Common Issues
+
+## Theme doesn't show
+Make sure the `GRUB_TIMEOUT_STYLE` in the defaults/grub file should is set to `menu`, so it immediately shows the menu (else you would need to press ESC first and you don't want that)
+
+## The font is too small
+Secure boot prevents grub from loading the fonts correctly, so the only solution for this I know is to disable secure boot in your BIOS. 
+
+## The theme is stretched / buttons are too small / too big
+Make sure to set the right resolution for your screen in `/etc/default/grub` like `GRUB_GFXMODE=2560x1440,1920x1080,auto`. You can see which resolutions your PC supports while pressing `c` while in the real grub menu and running the `videoinfo` command.
+
 # Configuration
 
 ## Adjusting for a different amount of boot options:
@@ -107,22 +118,27 @@ sudo ./install_theme.sh
   - (You can also edit the file in the cloned repository so you don't overwrite it again when you update the theme at some point (via a `cp -r`))
 - The formula and some precalculated values (for 2,3,4,5... boot options) are in the `theme.txt`, so you should be able to easily change it to the correct value.
 
-## Updating splash text, background and "x Packages Installed" text after every boot!
+## Changing splash text, background and the "x Packages Installed" text!
 
-The `update_theme.py` script chooses a random line from `assets/splashes.txt` and generates and replaces the `logo.png` which holds the splash text, as well as updates the amount of packages currently installed. It also randomly chooses a file from `backgrounds/` (ignoring hidden files beginning with a dot) as the background image.
+The `update_theme.py` script can make the theme more dynamic: It...
+- Chooses a random line from `assets/splashes.txt` (and then generates and replaces the `logo.png` which holds the splash text)
+  - To add new splash texts simply edit `./minegrub/assets/splashes.txt` and add them to the file.
+- Update the amount of packages currently installed.
+- Randomly chooses a file from `backgrounds/` (ignoring hidden files beginning with a dot) as the background image.
+  - Put all backgrounds you want to randomly choose from in `./minegrub/backgrounds/`. Hidden files (i.e. filenames beginning with a dot) will be ignored. You can also add your own images.
+- If you want to get a specific splash and/or background for the next boot, run `python update_theme.py [BACKGROUND_FILE [SPLASH]]` (e.g. `python update_theme.py 'backgrounds/1.15 - [Buzzy Bees].png' 'Splashing!'`)
+  - Empty string parameters will be replaced by a random choice, e.g. `python update_theme.py '' 'Splashing!'` for a random background and the splash `Splashing!`.
+
+**Dependencies**:
 - Make sure `fastfetch` or `neofetch` is installed
 - Make sure Python 3 (or an equivalent) and the Pillow python package are installed
   - Install Pillow either with the python-pillow package from the AUR or with
     `sudo -H pip3 install pillow`
   - It's important to use `sudo -H`, because it needs to be available for the root user
-- To add new splash texts simply edit `./minegrub/assets/splashes.txt` and add them to the file.
-- Put all backgrounds you want to randomly choose from in `./minegrub/backgrounds/`. Hidden files (i.e. filenames beginning with a dot) will be ignored. You can also add your own images.
-- If you want to get a specific splash and/or background for the next boot, run `python update_theme.py [BACKGROUND_FILE [SPLASH]]`, e.g. `python update_theme.py 'backgrounds/1.15 - [Buzzy Bees].png' 'Splashing!'`
-  - Empty string parameters will be replaced by a random choice, e.g. `python update_theme.py '' 'Splashing!'` for a random background and the splash `Splashing!`.
 
-### Update splash and "Packages Installed"...
+### Automatically update splash and "Packages Installed"...
 
-#### ...manually
+#### ...directly
 
 - Just run `python /boot/grub/themes/minegrub/update_theme.py` (from anywhere) after boot using whatever method works for you
 
@@ -145,10 +161,9 @@ sudo update-rc.d minecraft-grub defaults
 ## Setting the console background
 
 When in grub, pressing 'c' opens the grub console.
-If you want that console to have a background you can specify `GRUB_BACKGROUND=<path>` in `/etc/defaults/grub`
+A background you can be specified with `GRUB_BACKGROUND=<path>` in `/etc/defaults/grub`**though this doesn't work if a theme is set**
 
-**Though this doesn't work if a theme is set**, so you first need to change a line in a grub file.
-This can be done by running this pretty looking sed command:
+For this, you need to patch a line in a specific grub file. The installation script will do this for you, or you can use this pretty looking sed command:
 ```bash
 # Create a backup of the file first
 cp /etc/grub.d/00_header ./00_header.bak
@@ -164,10 +179,9 @@ And don't forget to regenerate the `grub.cfg` :)
 
 # Notes:
 
-- the `GRUB_TIMEOUT_STYLE` in the defaults/grub file should be set to `menu`, so it immediately shows the menu (else you would need to press ESC and you dont want that)
-- I'm no Linux expert, that's why I explain it so thoroughly, for other newbies :>
 - i use arch btw
-- i hope u like it, cause i sure do lmao
+- please don't sue me mojang, i've made zero dollars on this
+- if you work at mojang and _use_ this theme there, send me some proof lmao, that would be much more worth than dollars
 
 ---
 
@@ -179,4 +193,4 @@ And don't forget to regenerate the `grub.cfg` :)
 - [Vanilla Tweaks](https://vanillatweaks.net) for some of the backgrounds
 
 
-Font downloaded from https://www.fontspace.com/minecraft-font-f28180 and used for non commercial use.
+Font downloaded from https://www.fontspace.com/minecraft-font-f28180 and used for non-commercial use.

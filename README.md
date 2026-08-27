@@ -105,6 +105,7 @@ GRUB_THEME=/boot/grub/themes/minegrub/theme.txt
 Make sure to check the following lines are set in `/etc/defaults/grub`:
 - Set `GRUB_TIMEOUT_STYLE=menu`, so it immediately shows the menu (or else you would need to press ESC first)
 - **Comment out** `GRUB_TERMINAL_OUTPUT="console"` (by placing a `#` in front) because this would disable the graphical terminal.
+  - You could also add `GRUB_TERMINAL_OUTPUT="gfxterm"` to overwrite a possible default value.
 
 ## The font is too small
 Secure boot prevents grub from loading the fonts correctly, so the only solution for this I know is to disable secure boot in your BIOS. 
